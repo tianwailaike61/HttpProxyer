@@ -56,8 +56,4 @@ dependencies {
 
     implementation 'com.squareup.okhttp3:okhttp:4.9.0'
     implementation 'com.alibaba:fastjson:1.2.74'
-
-    implementation "com.feiniu.app.lib:update:1.1.7"
-
-    debugImplementation 'com.feiniu.app.lib:debugIniter:1.0.0'
 }
