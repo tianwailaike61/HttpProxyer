@@ -1,0 +1,16 @@
+apply plugin: 'java-library'
+
+compileJava {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+dependencies {
+    api project(':annotation')
+
+    implementation 'com.squareup:javapoet:1.12.1'
+    implementation 'org.apache.commons:commons-lang3:3.9'
+    implementation 'org.apache.commons:commons-collections4:4.4'
+}
+
+//apply from: '../bintray.gradle'

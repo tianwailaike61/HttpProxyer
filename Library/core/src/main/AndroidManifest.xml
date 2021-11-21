@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.twlk.core">
+
+    <queries>
+        <provider android:authorities="com.twlk.httpserver" />
+        <package android:name="com.twlk.httpserver" />
+<!--        <intent>-->
+<!--            <action android:name="com.twlk.httpserver.SERVER_ACTION" />-->
+<!--        </intent>-->
+    </queries>
+
+</manifest>

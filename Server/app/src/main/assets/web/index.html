@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kenny I Fast build Admin dashboard for any platform</title>
+    <meta name="description"
+          content="Kenny is a Dashboard & Admin Site Responsive Template by hencework.">
+    <meta name="keywords"
+          content="admin, admin dashboard, admin template, cms, crm, Kenny Admin, kennyadmin, premium admin templates, responsive admin, sass, panel, software, ui, visualization, web app, application">
+    <meta name="author" content="hencework">
+
+    <style>
+        pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
+        .string { color: green; }
+        .number { color: darkorange; }
+        .boolean { color: blue; }
+        .null { color: magenta; }
+        .key { color: red; }
+    </style>
+
+    <!-- jQuery -->
+    <script src="static/js/jquery.min.js"></script>
+
+    <script type="text/javascript">
+
+    var index = -1
+
+    function syntaxHighlight(json) {
+        if (typeof json != 'string') {
+            json = JSON.stringify(json, null, 2);
+        }
+        json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function(match) {
+            var cls = 'number';
+            if (/^"/.test(match)) {
+                if (/:$/.test(match)) {
+                    cls = 'key';
+                } else {
+                    cls = 'string';
+                }
+            } else if (/true|false/.test(match)) {
+                cls = 'boolean';
+            } else if (/null/.test(match)) {
+                cls = 'null';
+            }
+            return '<span class="' + cls + '">' + match + '</span>';
+        });
+    }
+
+    function getResponseData(id) {
+        var timer = setInterval(function() {
+            $.ajax({
+                type: 'GET', 
+                url:"/http/response?id="+id,
+                success: function(data) {
+                    if (data.errorCode != 200  || data.body == null){
+                        console.log("Data: " + JSON.stringify(data) + "\nStatus: " + status)
+                        return
+                    }
+                    var body = data.body
+                    if(body.state != 1){
+                        clearTimeout(timer)
+                    }
+                    $('#response_result').html(syntaxHighlight(body.response))
+                }
+            })
+        },1000)
+    }
+    
+    function showDetail(event,data) {
+        $.get(data.href,function(data,status) {
+            if (data.errorCode!=200  || data.body == null){
+                console.log("Data: " + JSON.stringify(data) + "\nStatus: " + status)
+                return
+            }
+            var body = data.body
+            $('#head_result').html(syntaxHighlight(body.head))
+            $('#request_result').html(syntaxHighlight(body.request))
+            $('#response_result').html(syntaxHighlight(body.response))
+            if(body.state == 1) {
+                getResponseData(data.extra)
+            }
+        })
+    }
+
+    function getUrls() {
+        $.ajax({type: 'GET', 
+        url:"/http/urls?index="+index,
+        success: function(data){
+            if (data.errorCode!=200  || data.body == null){
+                console.log("Data: " + JSON.stringify(data) + "\nStatus: " + status)
+                return
+            }
+            if(index == data.body.index){
+                return
+            }
+            index = data.body.index
+            var urls = data.body.urls
+            var l = []
+            for(var i in urls) {
+                var d = urls[i]
+                var ll = []
+                for(var j in d.list){
+                    ll[j] = {
+                        text: d.list[j].url,
+                        href: "/http/detail?id="+d.list[j].id,
+                        extra:d.list[j].id
+                    }
+                }
+                l[i] = {"text":d.key,"nodes":ll}
+            }
+            var $tree = $('#treeview1').treeview({
+              data: JSON.stringify(l)
+            });
+            $('#treeview1').on('nodeSelected', showDetail);
+        },error: function(){
+
+        }})
+    }
+
+    function clear() {
+        $.ajax({type: 'GET', 
+        url:"/http/clear",
+        success: function(data){
+            if (data.errorCode!=200  || data.body == null){
+                console.log("Data: " + JSON.stringify(data) + "\nStatus: " + status)
+                return
+            }
+            $('#head_result').html("")
+            $('#request_result').html("")
+            $('#response_result').html("")
+            getUrls()
+        },error: function(){
+
+        }})
+    }
+
+    $(function() {
+        getUrls()
+        $("#clear").click(function(event){
+           clear()
+        })
+        setInterval("getUrls()",1000)
+    })
+
+    </script>
+
+    <!-- Bootstrap Treeview -->
+    <link href="static/css/bootstrap-treeview.min.css" rel="stylesheet" type="text/css">
+
+    <!-- Custom CSS -->
+    <link href="static/css/style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+    <div class="wrapper">
+        <!-- Top Menu Items -->
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <a id="toggle_nav_btn" class="toggle-left-nav-btn inline-block mr-20 pull-left" href="javascript:void(0);"><i class="fa fa-bars"></i></a>
+            <ul class="nav navbar-right top-nav pull-right">
+                <li>
+                    <a href="">
+                    <i id="clear" class="fa fa fa-trash top-nav-icon"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Left Sidebar Menu -->
+        <div class="fixed-sidebar-left">
+            <div class="treeview" id="treeview1"></div>
+        </div>
+        <!-- /Left Sidebar Menu -->
+        <div class="page-wrapper">
+            <div class="panel panel-default card-view">
+                <div class="panel-wrapper collapse in">
+                    <div class="panel-body">
+                        <div class="tab-struct">
+                            <ul role="tablist" class="nav nav-tabs" id="myTabs_1">
+                                <li class="active" role="presentation"><a aria-expanded="true"
+                                                                            data-toggle="tab" role="tab"
+                                                                            id="home_tab_1" href="#head">head</a>
+                                </li>
+                                <li role="presentation" class=""><a data-toggle="tab" id="profile_tab_1"
+                                                                    role="tab" href="#request"
+                                                                    aria-expanded="false">request</a>
+                                </li>
+                                <li role="presentation" class=""><a data-toggle="tab" id="profile_tab_2"
+                                                                    role="tab" href="#response"
+                                                                    aria-expanded="false">response</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="myTabContent_1">
+                                <div id="head" class="tab-pane fade active in" role="tabpanel">
+                                    <pre id="head_result"></pre>
+                                </div>
+                                <div id="request" class="tab-pane fade" role="tabpanel">
+                                    <pre id="request_result"></pre>
+                                </div>
+                                <div id="response" class="tab-pane fade" role="tabpanel">
+                                    <pre id="response_result"></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- JavaScript -->
+
+<!-- Bootstrap Core JavaScript -->
+<script src="static/js/bootstrap.min.js"></script>
+
+<!-- Treeview JavaScript -->
+<script src="static/js/bootstrap-treeview.min.js"></script>
+
+<!-- Treeview Init JavaScript -->
+<!--<script src="static/js/treeview-data.js?version=1.12"></script>-->
+
+<!-- Slimscroll JavaScript -->
+<script src="static/js/jquery.slimscroll.js"></script>
+
+<!-- Fancy Dropdown JS -->
+<script src="static/js/dropdown-bootstrap-extended.js"></script>
+<!-- Init JavaScript -->
+<script src="static/js/init.js"></script>
+
+</body>
+</html>

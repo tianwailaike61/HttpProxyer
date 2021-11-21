@@ -1,5 +1,0 @@
-//include ':capture'
-includeBuild "proxy-plugin"
-include ':proxy'
-include ':app'
-rootProject.name = "HttpProxyer"

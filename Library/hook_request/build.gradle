@@ -1,0 +1,7 @@
+apply from: "../base_lib.gradle"
+
+dependencies {
+    api 'com.alibaba:fastjson:1.2.75'
+    api 'com.squareup.okhttp3:okhttp:5.0.0-alpha.2'
+    api project(":core")
+}

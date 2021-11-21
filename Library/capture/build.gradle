@@ -1,0 +1,6 @@
+apply from: "../base_lib.gradle"
+dependencies {
+
+    compileOnly project(":hook_request")
+    implementation project(":core")
+}
